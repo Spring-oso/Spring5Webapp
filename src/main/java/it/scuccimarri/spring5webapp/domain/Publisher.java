@@ -108,4 +108,5 @@ public class Publisher {
     public void setZip(String zip) {
         this.zip = zip;
     }
+
 }
