@@ -1,53 +1,62 @@
 package it.scuccimarri.spring5webapp.bootstrap;
 
-import it.scuccimarri.spring5webapp.domain.Author;
-import it.scuccimarri.spring5webapp.domain.Book;
-import it.scuccimarri.spring5webapp.repositories.AuthorRepository;
-import it.scuccimarri.spring5webapp.repositories.BookRepository;
+import it.scuccimarri.spring5webapp.domain.*;
+import it.scuccimarri.spring5webapp.repositories.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-// This is a Spring Managed component
 @Component
 public class BootStrapData implements CommandLineRunner {
 
     private final AuthorRepository authorRepository;
     private final BookRepository bookRepository;
+    private final PublisherRepository publisherRepository;
 
-    public BootStrapData(AuthorRepository authorRepository, BookRepository bookRepository) {
+    public BootStrapData(AuthorRepository authorRepository, BookRepository bookRepository, PublisherRepository publisherRepository) {
         this.authorRepository = authorRepository;
         this.bookRepository = bookRepository;
+        this.publisherRepository = publisherRepository;
     }
 
     @Override
     public void run(String... args) throws Exception {
 
-        // Create the entities
-        Author author = new Author("Marco", "Rossi");
-        Book book = new Book("Harry Potter e la pietra filosofale", "123456789");
-
-        // Create the relationships
-        author.getBooks().add(book);
-        book.getAuthors().add(author);
-
-        // These repositories save in H2 database (In the pom you can see the dependency)
-        authorRepository.save(author);
-        bookRepository.save(book);
-
-        // Create the entities
-        Author michele = new Author("Michele", "Verdi");
-        Book springBook = new Book("Spring in Action", "789456123");
-
-        // Create the relationships
-        author.getBooks().add(springBook);
-        book.getAuthors().add(michele);
-
-        // These repositories save in H2 database (In the pom you can see the dependency)
-        authorRepository.save(michele);
-        bookRepository.save(springBook);
-
-        // Print the result
         System.out.println("Started in Bootstrap");
+
+        Publisher publisher = new Publisher();
+        publisher.setName("SFG Publishing");
+        publisher.setCity("St Petersburg");
+        publisher.setState("FL");
+
+        publisherRepository.save(publisher);
+
+        System.out.println("Publisher Count: " + publisherRepository.count());
+
+        Author eric = new Author("Eric", "Evans");
+        Book ddd = new Book("Domain Driven Design", "123123");
+        eric.getBooks().add(ddd);
+        ddd.getAuthors().add(eric);
+
+        ddd.setPublisher(publisher);
+        publisher.getBooks().add(ddd);
+
+        authorRepository.save(eric);
+        bookRepository.save(ddd);
+        publisherRepository.save(publisher);
+
+        Author rod = new Author("Rod", "Johnson");
+        Book noEJB = new Book("J2EE Development without EJB", "3939459459");
+        rod.getBooks().add(noEJB);
+        noEJB.getAuthors().add(rod);
+
+        noEJB.setPublisher(publisher);
+        publisher.getBooks().add(noEJB);
+
+        authorRepository.save(rod);
+        bookRepository.save(noEJB);
+        publisherRepository.save(publisher);
+
         System.out.println("Number of Books: " + bookRepository.count());
+        System.out.println("Publisher Number of Books: " + publisher.getBooks().size());
     }
 }
